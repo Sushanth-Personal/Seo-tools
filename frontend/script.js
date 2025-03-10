@@ -1,23 +1,41 @@
 async function fetchResults(taskId) {
   let attempts = 0;
   const maxAttempts = 10; // Max retries
-  const delay = 5000; // 5 seconds delay between retries
+  const delay = 10000; // 10 seconds delay between retries
 
   while (attempts < maxAttempts) {
-    const response = await fetch(
-      `http://localhost:5000/broken-links/${taskId}`
-    );
-    const data = await response.json();
+    try {
+      const response = await fetch(
+        `http://localhost:5000/broken-links/${taskId}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
-    // Check if the task is completed and has results
-    if (data.tasks && data.tasks[0].result !== null) {
-      console.log(data);
-      return data; // ✅ Return the results
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // Check if the task is completed and has results
+      if (
+        data.tasks &&
+        data.tasks.length > 0 &&
+        data.tasks[0].result !== null
+      ) {
+        console.log(data);
+        return data; // ✅ Return the results
+      }
+
+      console.log(
+        `Attempt ${attempts + 1}: Task still in queue. Retrying...`
+      );
+    } catch (error) {
+      console.error("Fetch error:", error);
     }
 
-    console.log(
-      `Attempt ${attempts + 1}: Task still in queue. Retrying...`
-    );
     attempts++;
     await new Promise((resolve) => setTimeout(resolve, delay)); // Wait before retrying
   }
