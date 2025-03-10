@@ -3,6 +3,8 @@ const API_BASE_URL = window.location.hostname === "localhost"
   : "https://seo-tools-backend.onrender.com"; // Replace with your actual deployed URL
 
   async function fetchResults(taskId) {
+
+    console.log(taskId)
     let attempts = 0;
     const maxAttempts = 10; // Max retries
     const delay = 10000; // 10 seconds delay between retries
