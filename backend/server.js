@@ -65,17 +65,21 @@ app.post("/check-links", async (req, res) => {
 app.post("/broken-links/:taskId", async (req, res) => {
   const { taskId } = req.params;
 
+  if (!completedTasks.has(taskId)) {
+    return res.status(400).json({ error: "Task is not ready yet" });
+  }
+
   try {
-    const post_array = [];
-    post_array.push({
-      id: taskId,
-      filters: [
-        ["dofollow", "=", true],
-        "and",
-        ["direction", "=", "external"],
-      ],
-   
-    });
+    const post_array = [
+      {
+        id: taskId,
+        filters: [
+          ["dofollow", "=", true],
+          "and",
+          ["direction", "=", "external"],
+        ],
+      },
+    ];
 
     const response = await axios({
       method: "post",
@@ -84,7 +88,7 @@ app.post("/broken-links/:taskId", async (req, res) => {
         username: process.env.DATAFORSEO_USERNAME,
         password: process.env.DATAFORSEO_PASSWORD,
       },
-      data: post_array, // ✅ Exactly like their example
+      data: post_array,
       headers: {
         "Content-Type": "application/json",
       },
@@ -93,15 +97,26 @@ app.post("/broken-links/:taskId", async (req, res) => {
     console.log("Response Data:", response.data);
     res.json(response.data);
   } catch (error) {
-    console.error(
-      "API Error:",
-      error.response?.data || error.message
-    );
-    res
-      .status(500)
-      .json({ error: error.response?.data || error.message });
+    console.error("API Error:", error.response?.data || error.message);
+    res.status(500).json({ error: error.response?.data || error.message });
   }
 });
+
+const completedTasks = new Set(); // Store task IDs when they are ready
+
+app.get("/pingscript", (req, res) => {
+  const { id, tag } = req.query;
+
+  if (!id) {
+    return res.status(400).json({ error: "Task ID is required" });
+  }
+
+  completedTasks.add(id); // Mark task as completed
+  console.log(`Task ${id} completed with tag: ${tag}`);
+
+  res.json({ message: "Task received", taskId: id, tag });
+});
+
 
 app.listen(PORT, () =>
   console.log(`Server running on http://localhost:${PORT}`)
