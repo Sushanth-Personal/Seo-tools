@@ -74,7 +74,7 @@ app.post("/broken-links/:taskId", async (req, res) => {
         "and",
         ["direction", "=", "external"],
       ],
-      limit: 100, // ✅ Matches DataForSEO example
+   
     });
 
     const response = await axios({
