@@ -6,7 +6,7 @@ const API_BASE_URL =
 async function fetchResults(taskId) {
   console.log(taskId);
   let attempts = 0;
-  const maxAttempts = 10; // Max retries
+  const maxAttempts = 20; // Max retries
   const delay = 10000; // 10 seconds delay between retries
 
   while (attempts < maxAttempts) {
@@ -84,13 +84,12 @@ async function checkLinks() {
 
     // Fetch results only when they're ready
     const results = await fetchResults(data.taskId);
-    const brokenLinks = results.tasks[0].result.filter(
-      (link) => link.is_broken
-    );
+    const brokenLinks = results.tasks[0].result[0].items.filter(item => item.is_broken);
 
     resultsDiv.innerHTML = `
       <p>Task completed!</p>
-      <p>Total links checked: ${results.tasks[0].result.length}</p>
+      <p>Total links found: ${results.tasks[0].result[0].total_items_count}</p>
+      <p>Total links checked: ${results.tasks[0].result[0].items_count}</p>
       <p>Broken links found: ${brokenLinks.length}</p>
     `;
   } catch (error) {
