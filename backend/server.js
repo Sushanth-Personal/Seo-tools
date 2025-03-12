@@ -36,7 +36,7 @@ app.post("/check-links", async (req, res) => {
     const post_array = [
       {
         target,
-        max_crawl_pages: 10,
+        max_crawl_pages: 100,
         force_sitewide_checks: true,
         load_resources: true,
         enable_javascript: true,
