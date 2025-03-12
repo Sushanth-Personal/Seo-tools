@@ -12,6 +12,12 @@ app.use(express.json());
 app.use(cors());
 app.use(morgan("dev"));
 
+
+app.use(cors({
+  origin: "https://seo-tools-frontend.vercel.app", // Allow your frontend
+  methods: "GET,POST,PUT,DELETE", // Allow specific methods
+  allowedHeaders: "Content-Type,Authorization" // Allow specific headers
+}));
 // Route to check broken links (Creates a task)
 // Route to check broken links (Creates a task)
 app.post("/check-links", async (req, res) => {
