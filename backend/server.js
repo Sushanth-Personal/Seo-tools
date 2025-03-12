@@ -90,18 +90,15 @@ app.post("/broken-links/:taskId", async (req, res) => {
   if (!completedTasks.has(taskId)) {
     return res
       .status(202)
-      .json({ message: "Task is still processing. Try again later." });
+      .json({
+        message: "Task is still processing. Try again later.",
+      });
   }
 
   try {
     const post_array = [
       {
         id: taskId,
-        filters: [
-          ["dofollow", "=", true],
-          "and",
-          ["direction", "=", "external"],
-        ],
       },
     ];
 
@@ -121,8 +118,13 @@ app.post("/broken-links/:taskId", async (req, res) => {
     console.log("Response Data:", response.data);
     res.json(response.data);
   } catch (error) {
-    console.error("API Error:", error.response?.data || error.message);
-    res.status(500).json({ error: error.response?.data || error.message });
+    console.error(
+      "API Error:",
+      error.response?.data || error.message
+    );
+    res
+      .status(500)
+      .json({ error: error.response?.data || error.message });
   }
 });
 
